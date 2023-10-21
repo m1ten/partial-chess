@@ -110,64 +110,12 @@ void setAlgebraic(Matrix *matrix, int toPrint) {
   // set the algebraic notation for each point
   // based on the x and y coordinates
   // a8 = top left, h1 = bottom right
+  char col_values[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+
   for (int i = 0; i < 64; i++) {
-    // set the x coordinate
-    switch (matrix->points[i].x) {
-    case 0:
-      matrix->points[i].algebraic[0] = 'a';
-      break;
-    case 1:
-      matrix->points[i].algebraic[0] = 'b';
-      break;
-    case 2:
-      matrix->points[i].algebraic[0] = 'c';
-      break;
-    case 3:
-      matrix->points[i].algebraic[0] = 'd';
-      break;
-    case 4:
-      matrix->points[i].algebraic[0] = 'e';
-      break;
-    case 5:
-      matrix->points[i].algebraic[0] = 'f';
-      break;
-    case 6:
-      matrix->points[i].algebraic[0] = 'g';
-      break;
-    case 7:
-      matrix->points[i].algebraic[0] = 'h';
-      break;
-    }
-
-    // set the y coordinate
-    switch (matrix->points[i].y) {
-    case 0:
-      matrix->points[i].algebraic[1] = '8';
-      break;
-    case 1:
-      matrix->points[i].algebraic[1] = '7';
-      break;
-    case 2:
-      matrix->points[i].algebraic[1] = '6';
-      break;
-    case 3:
-      matrix->points[i].algebraic[1] = '5';
-      break;
-    case 4:
-      matrix->points[i].algebraic[1] = '4';
-      break;
-    case 5:
-      matrix->points[i].algebraic[1] = '3';
-      break;
-    case 6:
-      matrix->points[i].algebraic[1] = '2';
-      break;
-    case 7:
-      matrix->points[i].algebraic[1] = '1';
-      break;
-    }
-
-    // set the null terminator
+    // set the algebraic notation for each point
+    matrix->points[i].algebraic[0] = col_values[matrix->points[i].x];
+    matrix->points[i].algebraic[1] = 8 - matrix->points[i].y + '0';
     matrix->points[i].algebraic[2] = '\0';
   }
 
