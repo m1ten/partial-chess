@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct {
+typedef struct Point {
   unsigned char x;
   unsigned char y;
   // algebraic notation
@@ -20,7 +20,7 @@ typedef struct {
 } Point;
 
 // 8x8 matrix of points
-typedef struct {
+typedef struct Matrix {
   // 8x8 = 64 points
   Point points[64];
 } Matrix;
