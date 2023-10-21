@@ -22,27 +22,21 @@ typedef struct {
 void setAlgebraic(Matrix *matrix, int toPrint);
 void pathfinder(Matrix *matrix, Point *point);
 
-int main()
-{
+int main() {
   // read in an 8x8 matrix from standard input
   // store the location as x and y coordinates
   Matrix matrix;
   int x = 0, y = 0;
   char value;
 
-  while (scanf("%c", &value) != EOF)
-  {
+  while (scanf("%c", &value) != EOF) {
     // if newline, increment y and reset x
-    if (value == '\n')
-    {
+    if (value == '\n') {
       x = 0;
       y++;
-    }
-    else
-    {
+    } else {
       // store the value in the matrix if within range
-      if (x < 8 && y < 8)
-      {
+      if (x < 8 && y < 8) {
         int index = x + y * 8;
         matrix.points[index].x = x;
         matrix.points[index].y = y;
@@ -56,10 +50,8 @@ int main()
   setAlgebraic(&matrix, 1);
 
   // find the queen(s) [q]
-  for (int i = 0; i < 64; i++)
-  {
-    if (matrix.points[i].value == 'q')
-    {
+  for (int i = 0; i < 64; i++) {
+    if (matrix.points[i].value == 'q') {
       printf("\nFound a queen at %s\n", matrix.points[i].algebraic);
 
       // find and print the queen's possible moves
@@ -70,25 +62,19 @@ int main()
   return 0;
 }
 
-void printMatrix(Matrix matrix)
-{
+void printMatrix(Matrix matrix) {
   // print the top border
   printf("Board: \n  +-+-+-+-+-+-+-+-+\n");
 
-  // print the matrix using the algebraic notation and value (a8 = top left, h1 = bottom right)
-  for (int i = 0; i < 64; i++)
-  {
+  // print the matrix using the algebraic notation and value (a8 = top left, h1
+  // = bottom right)
+  for (int i = 0; i < 64; i++) {
     // print the left border, value, and right border in a single call to printf
-    if (i % 8 == 0)
-    {
+    if (i % 8 == 0) {
       printf("%d |%c|", 8 - i / 8, matrix.points[i].value);
-    }
-    else if (i % 8 == 7)
-    {
+    } else if (i % 8 == 7) {
       printf("%c|\n  +-+-+-+-+-+-+-+-+\n", matrix.points[i].value);
-    }
-    else
-    {
+    } else {
       printf("%c|", matrix.points[i].value);
     }
   }
@@ -97,19 +83,16 @@ void printMatrix(Matrix matrix)
   printf("   a b c d e f g h\n\n");
 }
 
-void setAlgebraic(Matrix *matrix, int toPrint)
-{
+void setAlgebraic(Matrix *matrix, int toPrint) {
   // set the algebraic notation for each point
   // based on the x and y coordinates
   // a8 = top left, h1 = bottom right
 
-  for (int i = 0; i < 64; i++)
-  {
+  for (int i = 0; i < 64; i++) {
     int x = matrix->points[i].x;
     int y = matrix->points[i].y;
 
-    if (x < 0 || x > 7 || y < 0 || y > 7)
-    {
+    if (x < 0 || x > 7 || y < 0 || y > 7) {
       continue;
     }
 
@@ -119,8 +102,7 @@ void setAlgebraic(Matrix *matrix, int toPrint)
     matrix->points[i].algebraic[2] = '\0';
   }
 
-  if (toPrint)
-  {
+  if (toPrint) {
     printMatrix(*matrix);
   }
 }
