@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 typedef struct {
   unsigned char x;
@@ -125,380 +126,44 @@ void setAlgebraic(Matrix *matrix, int toPrint) {
 }
 
 void pathfinder(Matrix *matrix, Point *point) {
-  // find all the possible moves for the queen until it hits a piece or the edge
-  // of the board store them in array of algebraic notations if piece is
-  // opponent's, store the alg notation + "x" + value of piece ('P', 'R', etc.)
-  // if piece is opponent's king, store "checkmate"
-  // if piece is own, ignore
-
-  // find the queen's possible moves
-
-  // largest string possible is "checkmate" (9 characters)
   char moves[64][10];
   char move_count = 0;
 
-  // check the 8 directions
-  // up
-  for (int i = point->y - 1; i >= 0; i--) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[point->x + i * 8].value == ' ') {
-      moves[move_count][0] = matrix->points[point->x + i * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[point->x + i * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[point->x + i * 8].value >= 'A' &&
-             matrix->points[point->x + i * 8].value <= 'Z') {
-      moves[move_count][0] = matrix->points[point->x + i * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[point->x + i * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] = matrix->points[point->x + i * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[point->x + i * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
+  // Define the 8 directions a queen can move in a 2D array
+  int directions[8][2] = {{-1, 0},  {1, 0},  {0, -1}, {0, 1},
+                          {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
-    // if the point is own piece, stop
-    else if (matrix->points[point->x + i * 8].value >= 'a' &&
-             matrix->points[point->x + i * 8].value <= 'z') {
-      break;
-    }
-  }
+  // Loop through each direction
+  for (int d = 0; d < 8; d++) {
+    for (int i = point->x + directions[d][0], j = point->y + directions[d][1];
+         i >= 0 && i < 8 && j >= 0 && j < 8;
+         i += directions[d][0], j += directions[d][1]) {
 
-  // down
-  for (int i = point->y + 1; i < 8; i++) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[point->x + i * 8].value == ' ') {
-      moves[move_count][0] = matrix->points[point->x + i * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[point->x + i * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[point->x + i * 8].value >= 'A' &&
-             matrix->points[point->x + i * 8].value <= 'Z') {
-      moves[move_count][0] = matrix->points[point->x + i * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[point->x + i * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] = matrix->points[point->x + i * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[point->x + i * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
+      // If the point is empty or an opponent's piece
+      if (matrix->points[i + j * 8].value == ' ' ||
+          (matrix->points[i + j * 8].value >= 'A' &&
+           matrix->points[i + j * 8].value <= 'Z')) {
+        strncpy(moves[move_count], matrix->points[i + j * 8].algebraic, 2);
+        if (matrix->points[i + j * 8].value != ' ') {
+          moves[move_count][2] = 'x';
+          moves[move_count][3] = matrix->points[i + j * 8].value;
+          moves[move_count][4] = '\0';
+        } else {
+          moves[move_count][2] = '\0';
+        }
+        move_count++;
+      }
 
-    // if the point is own piece, stop
-    else if (matrix->points[point->x + i * 8].value >= 'a' &&
-             matrix->points[point->x + i * 8].value <= 'z') {
-      break;
-    }
-  }
+      // If the point is an opponent's king
+      if (matrix->points[i + j * 8].value == 'K') {
+        strcpy(moves[move_count], "checkmate");
+        move_count++;
+      }
 
-  // left
-  for (int i = point->x - 1; i >= 0; i--) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[i + point->y * 8].value == ' ') {
-      moves[move_count][0] = matrix->points[i + point->y * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[i + point->y * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[i + point->y * 8].value >= 'A' &&
-             matrix->points[i + point->y * 8].value <= 'Z') {
-      moves[move_count][0] = matrix->points[i + point->y * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[i + point->y * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] = matrix->points[i + point->y * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[i + point->y * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
-
-    // if the point is own piece, stop
-    else if (matrix->points[i + point->y * 8].value >= 'a' &&
-             matrix->points[i + point->y * 8].value <= 'z') {
-      break;
-    }
-  }
-
-  // right
-  for (int i = point->x + 1; i < 8; i++) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[i + point->y * 8].value == ' ') {
-      moves[move_count][0] = matrix->points[i + point->y * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[i + point->y * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[i + point->y * 8].value >= 'A' &&
-             matrix->points[i + point->y * 8].value <= 'Z') {
-      moves[move_count][0] = matrix->points[i + point->y * 8].algebraic[0];
-      moves[move_count][1] = matrix->points[i + point->y * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] = matrix->points[i + point->y * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[i + point->y * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
-
-    // if the point is own piece, stop
-    else if (matrix->points[i + point->y * 8].value >= 'a' &&
-             matrix->points[i + point->y * 8].value <= 'z') {
-      break;
-    }
-  }
-
-  // up-left
-  for (int i = 1; point->x - i >= 0 && point->y - i >= 0; i++) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[point->x - i + (point->y - i) * 8].value == ' ') {
-      moves[move_count][0] =
-          matrix->points[point->x - i + (point->y - i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x - i + (point->y - i) * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[point->x - i + (point->y - i) * 8].value >= 'A' &&
-             matrix->points[point->x - i + (point->y - i) * 8].value <= 'Z') {
-      moves[move_count][0] =
-          matrix->points[point->x - i + (point->y - i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x - i + (point->y - i) * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] =
-          matrix->points[point->x - i + (point->y - i) * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[point->x - i + (point->y - i) * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
-
-    // if the point is own piece, stop
-    else if (matrix->points[point->x - i + (point->y - i) * 8].value >= 'a' &&
-             matrix->points[point->x - i + (point->y - i) * 8].value <= 'z') {
-      break;
-    }
-  }
-
-  // up-right
-  for (int i = 1; point->x + i < 8 && point->y - i >= 0; i++) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[point->x + i + (point->y - i) * 8].value == ' ') {
-      moves[move_count][0] =
-          matrix->points[point->x + i + (point->y - i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x + i + (point->y - i) * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[point->x + i + (point->y - i) * 8].value >= 'A' &&
-             matrix->points[point->x + i + (point->y - i) * 8].value <= 'Z') {
-      moves[move_count][0] =
-          matrix->points[point->x + i + (point->y - i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x + i + (point->y - i) * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] =
-          matrix->points[point->x + i + (point->y - i) * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[point->x + i + (point->y - i) * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
-
-    // if the point is own piece, stop
-    else if (matrix->points[point->x + i + (point->y - i) * 8].value >= 'a' &&
-             matrix->points[point->x + i + (point->y - i) * 8].value <= 'z') {
-      break;
-    }
-  }
-
-  // down-left
-  for (int i = 1; point->x - i >= 0 && point->y + i < 8; i++) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[point->x - i + (point->y + i) * 8].value == ' ') {
-      moves[move_count][0] =
-          matrix->points[point->x - i + (point->y + i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x - i + (point->y + i) * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[point->x - i + (point->y + i) * 8].value >= 'A' &&
-             matrix->points[point->x - i + (point->y + i) * 8].value <= 'Z') {
-      moves[move_count][0] =
-          matrix->points[point->x - i + (point->y + i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x - i + (point->y + i) * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] =
-          matrix->points[point->x - i + (point->y + i) * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[point->x - i + (point->y + i) * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
-
-    // if the point is own piece, stop
-    else if (matrix->points[point->x - i + (point->y + i) * 8].value >= 'a' &&
-             matrix->points[point->x - i + (point->y + i) * 8].value <= 'z') {
-      break;
-    }
-  }
-
-  // down-right
-  for (int i = 1; point->x + i < 8 && point->y + i < 8; i++) {
-    // if the point is empty, add it to the list of moves
-    if (matrix->points[point->x + i + (point->y + i) * 8].value == ' ') {
-      moves[move_count][0] =
-          matrix->points[point->x + i + (point->y + i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x + i + (point->y + i) * 8].algebraic[1];
-      moves[move_count][2] = '\0';
-      move_count++;
-    }
-    // if the point is an opponent's piece, add it to the list of moves
-    else if (matrix->points[point->x + i + (point->y + i) * 8].value >= 'A' &&
-             matrix->points[point->x + i + (point->y + i) * 8].value <= 'Z') {
-      moves[move_count][0] =
-          matrix->points[point->x + i + (point->y + i) * 8].algebraic[0];
-      moves[move_count][1] =
-          matrix->points[point->x + i + (point->y + i) * 8].algebraic[1];
-      moves[move_count][2] = 'x';
-      moves[move_count][3] =
-          matrix->points[point->x + i + (point->y + i) * 8].value;
-      moves[move_count][4] = '\0';
-      move_count++;
-      break;
-    }
-    // if the point is an opponent's king, add it to the list of moves
-    else if (matrix->points[point->x + i + (point->y + i) * 8].value == 'K') {
-      moves[move_count][0] = 'c';
-      moves[move_count][1] = 'h';
-      moves[move_count][2] = 'e';
-      moves[move_count][3] = 'c';
-      moves[move_count][4] = 'k';
-      moves[move_count][5] = 'm';
-      moves[move_count][6] = 'a';
-      moves[move_count][7] = 't';
-      moves[move_count][8] = 'e';
-      moves[move_count][9] = '\0';
-      move_count++;
-      break;
-    }
-
-    // if the point is own piece, stop
-    else if (matrix->points[point->x + i + (point->y + i) * 8].value >= 'a' &&
-             matrix->points[point->x + i + (point->y + i) * 8].value <= 'z') {
-      break;
+      // If the point is own piece or an opponent's piece, stop
+      if (matrix->points[i + j * 8].value != ' ') {
+        break;
+      }
     }
   }
 
@@ -506,8 +171,22 @@ void pathfinder(Matrix *matrix, Point *point) {
   if (move_count == 0) {
     printf("No moves for the queen.\n");
   } else {
+    // if found, print "checkmate"
+    // else print the moves
+    char *checkmate_move = NULL;
     for (int i = 0; i < move_count; i++) {
-      printf("%s\n", moves[i]);
+      if (strcmp(moves[i], "checkmate") == 0) {
+        checkmate_move = moves[i];
+        break;
+      }
+    }
+
+    if (checkmate_move != NULL) {
+      printf("%s\n", checkmate_move);
+    } else {
+      for (int i = 0; i < move_count; i++) {
+        printf("%s\n", moves[i]);
+      }
     }
   }
 }
