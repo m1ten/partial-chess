@@ -107,20 +107,26 @@ void printMatrix(Matrix matrix) {
   printf("   a b c d e f g h\n\n");
 }
 
-void setAlgebraic(Matrix *matrix, int toPrint) {
+void setAlgebraic(Matrix *matrix, int toPrint)
+{
   // set the algebraic notation for each point
   // based on the x and y coordinates
   // a8 = top left, h1 = bottom right
   char col_values[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 
-  for (int i = 0; i < 64; i++) {
+  for (int i = 0; i < 64; i++)
+  {
+    int x = matrix->points[i].x;
+    int y = matrix->points[i].y;
+
     // set the algebraic notation for each point
-    matrix->points[i].algebraic[0] = col_values[matrix->points[i].x];
-    matrix->points[i].algebraic[1] = 8 - matrix->points[i].y + '0';
+    matrix->points[i].algebraic[0] = col_values[x];
+    matrix->points[i].algebraic[1] = 8 - y + '0';
     matrix->points[i].algebraic[2] = '\0';
   }
 
-  if (toPrint) {
+  if (toPrint)
+  {
     printMatrix(*matrix);
   }
 }
