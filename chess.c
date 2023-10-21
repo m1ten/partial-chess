@@ -1,3 +1,9 @@
+/*
+  Partial Chess
+  Made by: Miten
+  Date: 2023-21-10
+*/
+
 #include <stdio.h>
 #include <string.h>
 
