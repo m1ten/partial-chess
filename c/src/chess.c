@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "chess.h"
+#include "../include/chess.h"
 
 int main() {
   // read in an 8x8 matrix from standard input
